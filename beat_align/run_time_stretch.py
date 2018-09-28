@@ -3,6 +3,7 @@ import numpy as np
 import soundfile as sf
 import pyrubberband as prb
 import argparse
+import os
 
 FILENAME1 = 'data/MDBDrums/MDB Drums/audio/drum_only/MusicDelta_80sRock_Drum.wav'
 FILENAME2 = 'data/MDBDrums/MDB Drums/audio/drum_only/MusicDelta_Beatles_Drum.wav'
@@ -14,7 +15,7 @@ def _get_cmdline_args():
     parser.add_argument("--filename2", type=str,
                         help="Filename 2. Will be time stretched to run "
                              "synchronously to file 1.")
-    parser.add_argument("--filename_out", type=str, default='output.wav',
+    parser.add_argument("--filename_out", type=str, default='',
                         help="Output filename")
 
     return parser.parse_args()
@@ -58,7 +59,10 @@ def main():
     y2_new_stretched = prb.timemap_stretch(np.transpose(y2_new), sr, time_map)
 
     # Writing to file
-    sf.write(args.filename_out, y2_new_stretched, sr)
+    filename_out = args.filename_out
+    if len(filename_out) == 0:
+        filename_out = 'stretched_to_' + os.path.basename(args.filename1) + '_from_' + os.path.basename(args.filename2) + '_.wav'
+    sf.write(filename_out, y2_new_stretched, sr)
 
 if __name__ == '__main__':
     main()
